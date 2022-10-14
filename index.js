@@ -18,16 +18,17 @@ app.listen(PORT, (error) => {
 });
 
 app.get("/", (req, res) => {
-    let query = `SELECT * FROM public.products`;
+    // let query = `SELECT * FROM public.products`;
 
-    // res.send("Hello developer welcome to teebay Backend.");
-    client.query(query, (err, result) => {
-        if (!err) {
-            res.send(result.rows);
-            // console.log(result.rows);
-        } else {
-            console.log(err);
-        }
-    });
-    client.end;
+    // // res.send("Hello developer welcome to teebay Backend.");
+    // client.query(query, (err, result) => {
+    //     if (!err) {
+    //         res.send(result.rows);
+    //         // console.log(result.rows);
+    //     } else {
+    //         console.log(err);
+    //     }
+    // });
+    // client.end;
+    res.send("Hello developer Welcome to Game of Nature server.");
 });

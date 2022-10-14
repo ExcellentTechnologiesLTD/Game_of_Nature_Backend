@@ -2,10 +2,10 @@ const { Client, DatabaseError } = require("pg");
 
 const client = new Client({
     host: "db.thin.dev",
-    user: "OMxeTIqYtuaizgERZMqdAfKNNArveIcg",
+    user: "qnSNSWmHbPjGewzWMazpXHohVygtSqFM",
     port: 5432,
-    password: "ZmohRdCxNnBAImPQIHzwrquqSUAodwYV",
-    database: "43b0e7d6-ac6f-497d-89b5-557ca7e77ea2",
+    password: "vjYZlrUWMTZfXbVlwhgGVkXRWGMZibGV",
+    database: "edb7fe11-9682-4d03-9995-9ca2c7a8a297",
 });
 
 module.exports = client;

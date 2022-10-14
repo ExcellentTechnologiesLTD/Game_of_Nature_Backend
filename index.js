@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ extended: false }));
 
-// client.connect();
-// console.log();
+client.connect();
+console.log("DB connected");
 
 app.listen(PORT, (error) => {
     if (!error) {
@@ -20,17 +20,17 @@ app.listen(PORT, (error) => {
 });
 
 app.get("/", (req, res) => {
-    // let query = `SELECT * FROM public.products`;
+    let query = `SELECT * FROM public.products`;
 
-    // // res.send("Hello developer welcome to teebay Backend.");
-    // client.query(query, (err, result) => {
-    //     if (!err) {
-    //         res.send(result.rows);
-    //         // console.log(result.rows);
-    //     } else {
-    //         console.log(err);
-    //     }
-    // });
-    // client.end;
-    res.send("Hello developer Welcome to Game of Nature server. Bhalo Achen??");
+    // res.send("Hello developer welcome to teebay Backend.");
+    client.query(query, (err, result) => {
+        if (!err) {
+            res.send(result.rows);
+            // console.log(result.rows);
+        } else {
+            console.log(err);
+        }
+    });
+    client.end;
+    // res.send("Hello developer Welcome to Game of Nature server. Bhalo Achen??");
 });

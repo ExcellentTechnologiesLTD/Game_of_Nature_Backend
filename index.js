@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
+const client = require("./connection");
+
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -14,5 +16,16 @@ app.listen(PORT, (error) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Hello developer Welcome to Game of Nature server.");
+    let query = `SELECT * FROM public.products`;
+
+    // res.send("Hello developer welcome to teebay Backend.");
+    client.query(query, (err, result) => {
+        if (!err) {
+            // res.send(result.rows);
+            console.log(result.rows[0].Categories);
+        } else {
+            console.log(err);
+        }
+    });
+    client.end;
 });

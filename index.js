@@ -32,5 +32,5 @@ app.get("/", (req, res) => {
     //     }
     // });
     // client.end;
-    res.send("Hello developer Welcome to Game of Nature server.");
+    res.send("Hello developer Welcome to Game of Nature server. Bhalo Achen??");
 });

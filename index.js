@@ -20,6 +20,21 @@ app.listen(PORT, (error) => {
     }
 });
 
+app.get("/get-details/:id", (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    let query = `SELECT * FROM public.products Where product_id ='${id}'`;
+
+    client.query(query, (err, result) => {
+        if (!err) {
+            res.send(result.rows[0]);
+        } else {
+            console.log(err);
+        }
+    });
+    client.end;
+});
+
 app.get("/", (req, res) => {
     let query = `SELECT * FROM public.products`;
 
@@ -70,8 +85,7 @@ app.delete("/delete-item/:id", (req, res) => {
     const id = req.params.id;
     console.log(id);
 
-    const queryDeleteItem = `DELETE FROM public.products
-	WHERE "product_id"=${id};`;
+    const queryDeleteItem = `DELETE FROM public.products WHERE "product_id"=${id};`;
 
     client.query(queryDeleteItem, (err, result) => {
         if (!err) {

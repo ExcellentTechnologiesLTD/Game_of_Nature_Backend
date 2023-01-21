@@ -331,3 +331,34 @@ app.get("/getmyorders/:userid", async(req, res) => {
         });
     }
 });
+
+app.get("/getallorders", async(req, res) => {
+    const allOrders = await functions.getAllOrders();
+    if (allOrders.status == 200 && allOrders.success) {
+        res.send(allOrders.result);
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: "Error in query. Call developer.",
+            data: allOrders,
+        });
+    }
+});
+
+app.get("/getuser-infobyid/:userid", async(req, res) => {
+    const userid = req.params.userid;
+    console.log(userid);
+
+    const userInfo = await functions.getUserInfoByID(userid);
+    if (userInfo.status == 200 && userInfo.success) {
+        res.send(userInfo.info);
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: "Error in query. Call developer.",
+            data: userInfo,
+        });
+    }
+});

@@ -129,14 +129,40 @@ async function insertOrderDetails(info) {
     }
 }
 
+async function getUserInfoByID(userID) {
+    console.log("Checking: ", userID);
+    try {
+        let queryGetUserInfo = `SELECT * FROM public."Users" Where "user_id" = '${userID}'`;
+        const result = await client.query(queryGetUserInfo);
+        console.log("result \n", result);
+
+        if (result.rowCount > 0 && result.rows[0].user_id == userID) {
+            console.log("User found in DB.");
+            console.log("User Found");
+            return {
+                status: 200,
+                msg: "User Found In DB.",
+                success: true,
+                user_id: result.rows[0].user_id,
+                info: result.rows[0],
+            };
+        }
+        console.log("User Not Found");
+        return { status: 404, msg: "User Info Not Found.", success: false };
+    } catch (error) {
+        console.error("Error", error);
+        return {
+            status: false,
+            error: error,
+        };
+    }
+}
+
 async function getMyOrders(user_id) {
     try {
-        let queryGetMyOrders = `Select * 
-        from (SELECT * FROM public.orders 
+        let queryGetMyOrders = `SELECT * FROM public.orders 
             Where "user_id"='${user_id}' 
-            ORDER BY ordered_date DESC )
-            AS myOrders 
-        ORDER BY ordered_time DESC`;
+            ORDER BY order_id DESC`;
 
         // const params = [user_id];
 
@@ -170,9 +196,42 @@ async function getMyOrders(user_id) {
     }
 }
 
+async function getAllOrders() {
+    try {
+        let queryGetMyOrders = `SELECT * FROM public.orders ORDER BY order_id DESC `;
+
+        const result = await client.query(queryGetMyOrders);
+
+        if (result.rowCount >= 1 && result.rows[0].order_id != null) {
+            return {
+                status: 200,
+                success: true,
+                msg: "Found results",
+                result: result.rows,
+            };
+        }
+        console.log("Error in function Database query.");
+        return {
+            status: 200,
+            success: true,
+            msg: "No Orders",
+            result: result.rows,
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in getting order, Call Developer. \n ",
+            Error: error,
+        };
+    }
+}
 module.exports = {
     signUp,
     insertOrderDetails,
     checkUserExistence,
     getMyOrders,
+    getAllOrders,
+    getUserInfoByID,
 };

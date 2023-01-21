@@ -362,3 +362,19 @@ app.get("/getuser-infobyid/:userid", async(req, res) => {
         });
     }
 });
+
+app.delete("/delete-order/:orderid", async(req, res) => {
+    const orderID = req.params.orderid;
+    console.log(orderID);
+
+    const orderDeleted = await functions.deleteOrder(orderID);
+    if (orderDeleted.success && orderDeleted.status == 200) {
+        res.send({
+            status: 200,
+            success: true,
+            msg: "Order deleted.",
+        });
+    } else {
+        res.send({ status: 404, success: false, msg: "Could not delete order." });
+    }
+});

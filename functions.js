@@ -227,6 +227,34 @@ async function getAllOrders() {
         };
     }
 }
+
+async function deleteOrder(orderID) {
+    try {
+        let queryDeleteOrder = `DELETE FROM public.orders WHERE "order_id"=${orderID}`;
+
+        const result = await client.query(queryDeleteOrder);
+        // console.log("result: \n", result);
+        if (result.rowCount == 1) {
+            return {
+                status: 200,
+                success: true,
+            };
+        }
+        console.log("Could not delete order.");
+        return {
+            status: 404,
+            success: false,
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error",
+            data: error,
+        };
+    }
+}
 module.exports = {
     signUp,
     insertOrderDetails,
@@ -234,4 +262,5 @@ module.exports = {
     getMyOrders,
     getAllOrders,
     getUserInfoByID,
+    deleteOrder,
 };

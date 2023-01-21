@@ -1,0 +1,17 @@
+POST http://localhost:3300/confirm-order HTTP/1.1
+content-type: application/json
+
+{
+    "email":"samiha@gmail.com",
+    "items": "logo",
+    "total_amount":400,
+    "payment_method":"COD",
+    "firstName":"hinan",
+    "lastName":"Sadique",
+    "address":"Green Road",
+    "city":"Dhaka",
+    "postal_code":"1205",
+    "phoneNumber":"12345678",
+    "password":"123456"
+}
+ 

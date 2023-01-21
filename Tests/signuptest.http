@@ -1,0 +1,17 @@
+POST http://localhost:3300/confirm-order HTTP/1.1
+content-type: application/json
+
+{
+    "email":"baba@gmail.com",
+    "items": "Samsung",
+    "total_amount":999,
+    "payment_method":"BKASH",
+    "firstName":"excel",
+    "lastName":"Tech",
+    "address":"36 Green Road",
+    "city":"Dhaka",
+    "postal_code":"1205",
+    "phoneNumber":"6788",
+    "password":"123456"
+}
+ 

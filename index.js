@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 
 const client = require("./connection");
-const { query } = require("./connection");
+const functions = require("./functions");
 
 const PORT = process.env.PORT || 3300;
 
@@ -20,37 +20,56 @@ app.listen(PORT, (error) => {
     }
 });
 
-app.post("/signup", (req, res) => {
-    const { firstName, lastName, address, email, phoneNumber, password } =
-    req.body;
-
+app.post("/check-existence", async(req, res) => {
+    const { email } = req.body;
     console.log(req.body);
+    console.log("Checking....");
+    const userExistence = await functions.checkUserExistence(email);
+    if (
+        userExistence.status == 200 &&
+        userExistence.success &&
+        userExistence.user_id
+    ) {
+        res.send({
+            status: 200,
+            msg: "User Found In DB.",
+            success: true,
+            user_id: userExistence.user_id,
+            info: userExistence.info,
+        });
+    } else {
+        res.send({ status: 404, msg: "User Not Found.", success: false });
+    }
+});
 
-    queryInsertNewUser = `INSERT INTO public."Users"(
-        "First_Name", "Email", "Mobile", "Address", "User_Type", "Last_Name", "password")
-        VALUES ('${firstName}', '${email}', '${phoneNumber}', '${address}', 'Customer', '${lastName}', '${password}')
-        RETURNING user_id;`;
+app.post("/signup", async(req, res) => {
+    // console.log("from signup: \n", req.body);
+    const {
+        firstName,
+        lastName,
+        address,
+        email,
+        phoneNumber,
+        password,
+        city,
+        postal_code,
+    } = req.body;
 
-    client.query(queryInsertNewUser, (err, result) => {
-        if (!err) {
-            if (result.rowCount == 1) {
-                console.log("User registered.");
-                res.send({
-                    status: "Success",
-                    msg: "User Registered Successfully",
-                    user_id: result.rows[0].user_id,
-                });
-            } else {
-                console.log("Not Registered.");
-                res.send({
-                    status: "Error",
-                    msg: "Could not register user. Call Developer.",
-                });
-            }
-        } else {
-            console.log(err);
-        }
-    });
+    console.log("only req: ", req.body);
+
+    const userSignUp = await functions.signUp(req.body);
+    if (userSignUp.status === "Success" && userSignUp.user_id) {
+        res.send({
+            status: "Success",
+            msg: "User Registered Successfully",
+            user_id: userSignUp.user_id,
+        });
+    } else {
+        res.send({
+            status: "Error",
+            msg: "Could not register user. Call Developer.",
+        });
+    }
 });
 
 app.post("/signin", (req, res) => {
@@ -175,4 +194,140 @@ app.delete("/delete-item/:id", (req, res) => {
             console.log(err);
         }
     });
+});
+
+app.post("/confirm-order", async(req, res) => {
+    const {
+        email,
+        user_id,
+        orderedItems,
+        totalAmount,
+        paymentMethod,
+        firstName,
+        lastName,
+        address,
+        city,
+        postal_code,
+        phoneNumber,
+        password,
+    } = req.body.orderInfo;
+
+    //*********Date & Time******************************************************
+    var today = new Date();
+    var date =
+        today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes();
+    //*********Date & Time******************************************************
+    const orderData = {
+        user_id: user_id,
+        orderedItems: orderedItems,
+        totalAmount: totalAmount,
+        date: date,
+        time: time,
+        paymentMethod: paymentMethod,
+    };
+
+    const signUpData = {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        city: city,
+        postal_code: postal_code,
+        phoneNumber: phoneNumber,
+    };
+    console.log("req.body:\n\n");
+    console.log(req.body);
+    console.log("OrderData:\n\n");
+    console.log(orderData);
+    console.log("signUpData:\n\n");
+    console.log(signUpData);
+
+    // if user Found
+    if (user_id) {
+        // insert order data into table
+        const orderResult = await functions.insertOrderDetails(orderData);
+        if (
+            orderResult.status == 200 &&
+            orderResult.success &&
+            orderResult.order_id
+        ) {
+            console.log("Order added successfully.");
+            res.send({
+                status: 200,
+                success: true,
+                msg: "Order placed.",
+                order_id: orderResult.order_id,
+                user_id: user_id,
+            });
+        } else {
+            res.send({
+                status: 404,
+                success: false,
+                msg: "Error, order not placed.",
+            });
+        }
+    } else {
+        // create account
+        console.log("Creating user...");
+        const data = await functions.signUp(signUpData);
+        console.log("Data: ", data);
+
+        if (
+            data.status === "Success" &&
+            (data.user_id != undefined || data.user_id != null || data.user_id > 0)
+        ) {
+            // ******************************************************************************
+            // if user created enter order Info in DB
+            const orderDataAfterSignUp = {
+                user_id: data.user_id,
+                orderedItems: orderedItems,
+                totalAmount: totalAmount,
+                date: date,
+                time: time,
+                paymentMethod: paymentMethod,
+            };
+            console.log("Placing Order....");
+            const orderInserted = await functions.insertOrderDetails(
+                orderDataAfterSignUp
+            );
+            if (
+                orderInserted.status == 200 &&
+                orderInserted.success &&
+                orderInserted.order_id
+            ) {
+                console.log("Order added successfully.");
+                res.send({
+                    status: 200,
+                    success: true,
+                    msg: "Order placed.",
+                    order_id: orderInserted.order_id,
+                    user_id: data.user_id,
+                });
+            } else {
+                res.send({
+                    status: 404,
+                    success: false,
+                    msg: "Error, order not placed.",
+                });
+            }
+        }
+    }
+});
+
+app.get("/getmyorders/:userid", async(req, res) => {
+    const id = req.params.userid;
+    console.log(id);
+
+    const myOrders = await functions.getMyOrders(id);
+    if (myOrders.status == 200 && myOrders.success) {
+        res.send(myOrders.result);
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: "Error in query. Call developer.",
+            data: myOrders,
+        });
+    }
 });

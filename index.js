@@ -378,3 +378,23 @@ app.delete("/delete-order/:orderid", async(req, res) => {
         res.send({ status: 404, success: false, msg: "Could not delete order." });
     }
 });
+
+app.put("/update-order", async(req, res) => {
+    const { orderID, status } = req.body;
+    console.log(req.body);
+
+    const updatedOrder = await functions.updateOrderStatus(orderID, status);
+    if (updatedOrder.status == 200 && updatedOrder.success) {
+        res.send({
+            status: 200,
+            success: true,
+            msg: "Order status updated. Packaging started.",
+        });
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: "ERROR. Couldn't update order status.",
+        });
+    }
+});

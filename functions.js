@@ -255,6 +255,39 @@ async function deleteOrder(orderID) {
         };
     }
 }
+
+async function updateOrderStatus(orderID, status) {
+    console.log("From function\n", orderID, "\n", status);
+
+    try {
+        let queryUpdateOrderStatus = `UPDATE public.orders
+        SET "order_status"='${status}' WHERE "order_id"='${orderID}'`;
+
+        const result = await client.query(queryUpdateOrderStatus);
+        console.log("result>>>\n ", result);
+        if (result.rowCount == 1) {
+            return {
+                status: 200,
+                success: true,
+                msg: "Order status updated. Packaging started.",
+            };
+        }
+        console.log("ERROR. Couldn't update order status.");
+        return {
+            status: 404,
+            success: false,
+            msg: "ERROR. Couldn't update order status.",
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
 module.exports = {
     signUp,
     insertOrderDetails,
@@ -263,4 +296,5 @@ module.exports = {
     getAllOrders,
     getUserInfoByID,
     deleteOrder,
+    updateOrderStatus,
 };

@@ -288,6 +288,132 @@ async function updateOrderStatus(orderID, status) {
         };
     }
 }
+
+async function addVoucher(voucherName, voucherAmount) {
+    try {
+        let queryInsertVoucherData = `INSERT INTO public."Vouchers"(
+            voucher_name, discount_amount, "isActive")
+            VALUES ($1, $2, 'true')
+            RETURNING voucher_id`;
+
+        const params = [voucherName, voucherAmount];
+
+        const result = await client.query(queryInsertVoucherData, params);
+        console.log("result>>>\n ", result);
+
+        if (result.rowCount == 1 && result.rows[0].voucher_id != null) {
+            return {
+                status: 200,
+                success: true,
+                msg: "Voucher Added.",
+                voucherID: result.rows[0].voucher_id,
+            };
+        }
+        console.log("Could not add voucher.");
+        return {
+            status: 404,
+            success: false,
+            msg: "Could not add voucher.",
+            voucherID: null,
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
+
+async function getAllVoucher() {
+    try {
+        let queryGetAllVouchers = `SELECT * FROM public."Vouchers"
+        ORDER BY voucher_id DESC `;
+
+        const result = await client.query(queryGetAllVouchers);
+
+        if (result.rowCount >= 1 && result.rows[0].voucher_id != null) {
+            return {
+                status: 200,
+                success: true,
+                msg: "Found results",
+                result: result.rows,
+            };
+        }
+        console.log("No Vouchers.");
+        return {
+            status: 200,
+            success: true,
+            msg: "No vouchers",
+            result: result.rows,
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in getting order, Call Developer. \n ",
+            Error: error,
+        };
+    }
+}
+
+async function changeStatusVoucher(voucherID, status) {
+    try {
+        let queryChangeStatus = `UPDATE public."Vouchers" 
+                SET "isActive"='${status}'
+                WHERE voucher_id='${voucherID}'`;
+
+        const result = await client.query(queryChangeStatus);
+        // console.log("result: >> from function \n\n", result);
+
+        if (result.rowCount == 1) {
+            return { status: 200, success: true, msg: "Status Changed." };
+        }
+        console.log("Could not change Status");
+        return { status: 404, success: false, msg: "Could not change Status." };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
+
+async function deleteVoucher(voucherID) {
+    try {
+        let queryDeleteVoucher = `DELETE FROM public."Vouchers"
+                WHERE voucher_id='${voucherID}'`;
+
+        const result = await client.query(queryDeleteVoucher);
+        if (result.rowCount == 1) {
+            return {
+                status: 200,
+                success: true,
+            };
+        }
+        console.log("Could not delete voucher.");
+        return {
+            status: 404,
+            success: false,
+            msg: "Could not delete voucher.",
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
+
 module.exports = {
     signUp,
     insertOrderDetails,
@@ -297,4 +423,8 @@ module.exports = {
     getUserInfoByID,
     deleteOrder,
     updateOrderStatus,
+    addVoucher,
+    getAllVoucher,
+    changeStatusVoucher,
+    deleteVoucher,
 };

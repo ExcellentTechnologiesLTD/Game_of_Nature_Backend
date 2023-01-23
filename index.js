@@ -398,3 +398,62 @@ app.put("/update-order", async(req, res) => {
         });
     }
 });
+
+app.post("/add-voucher", async(req, res) => {
+    const { voucherName, voucherAmount } = req.body;
+    console.log(req.body);
+
+    const result = await functions.addVoucher(voucherName, voucherAmount);
+    if (result.status == 200 && result.success) {
+        res.send({
+            status: 200,
+            success: true,
+            msg: "Voucher Added.",
+            voucherID: result.voucherID,
+        });
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: result.msg,
+        });
+    }
+});
+
+app.get("/getall-vouchers", async(req, res) => {
+    const result = await functions.getAllVoucher();
+    if ((result.status = 200 && result.success)) {
+        res.send(result.result);
+    } else {
+        res.send({
+            status: 404,
+            success: false,
+            msg: "Could not find any voucher.",
+        });
+    }
+    // console.log(result.result);
+});
+
+app.patch("/changestatus-voucher", async(req, res) => {
+    const { voucherID, status } = req.body;
+
+    const result = await functions.changeStatusVoucher(voucherID, status);
+    // console.log(result);
+    if (result.status == 200 && result.success) {
+        res.send(result);
+    } else {
+        res.send(result);
+    }
+});
+
+app.delete("/delete-voucher/:voucherid", async(req, res) => {
+    const voucherID = req.params.voucherid;
+    console.log(voucherID);
+
+    const result = await functions.deleteVoucher(voucherID);
+    if ((result.status = 200 && result.success)) {
+        res.send({ success: true, status: 200, msg: "Voucher Deleted." });
+    } else {
+        res.send({ success: false, status: 404, msg: result.msg });
+    }
+});

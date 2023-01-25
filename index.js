@@ -203,28 +203,35 @@ app.post("/confirm-order", async(req, res) => {
         orderedItems,
         totalAmount,
         paymentMethod,
+        discountAmount,
+        voucherName,
         firstName,
         lastName,
         address,
         city,
         postal_code,
         phoneNumber,
-        password,
+        date,
+        time,
     } = req.body.orderInfo;
 
-    //*********Date & Time******************************************************
-    var today = new Date();
-    var date =
-        today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-    var time = today.getHours() + ":" + today.getMinutes();
-    //*********Date & Time******************************************************
+    // //*********Date & Time******************************************************
+    // var today = new Date();
+    // var date =
+    //     today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    // var time = today.getHours() + ":" + today.getMinutes();
+    // //*********Date & Time******************************************************
     const orderData = {
         user_id: user_id,
         orderedItems: orderedItems,
         totalAmount: totalAmount,
+        discountAmount: discountAmount,
+        voucherName: voucherName,
         date: date,
         time: time,
         paymentMethod: paymentMethod,
+        date: date,
+        time: time,
     };
 
     const signUpData = {
@@ -235,6 +242,8 @@ app.post("/confirm-order", async(req, res) => {
         city: city,
         postal_code: postal_code,
         phoneNumber: phoneNumber,
+        date: date,
+        time: time,
     };
     console.log("req.body:\n\n");
     console.log(req.body);
@@ -455,5 +464,18 @@ app.delete("/delete-voucher/:voucherid", async(req, res) => {
         res.send({ success: true, status: 200, msg: "Voucher Deleted." });
     } else {
         res.send({ success: false, status: 404, msg: result.msg });
+    }
+});
+
+app.get("/get-voucher/:vouchername", async(req, res) => {
+    const voucherName = req.params.vouchername;
+    console.log(voucherName);
+    const result = await functions.getVoucher(voucherName);
+    if (result.status == 200 && result.success) {
+        console.log("YES\n\n", result);
+        res.send(result.data);
+    } else {
+        console.log("NO\n\n", result);
+        res.send(result);
     }
 });

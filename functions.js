@@ -86,18 +86,28 @@ async function checkUserExistence(email) {
 
 async function insertOrderDetails(info) {
     try {
-        const { user_id, orderedItems, totalAmount, date, time, paymentMethod } =
-        info;
+        const {
+            user_id,
+            orderedItems,
+            totalAmount,
+            discountAmount,
+            voucherName,
+            date,
+            time,
+            paymentMethod,
+        } = info;
         console.log("info:\n\n\n", info);
         let queryInsertOrderData = `INSERT INTO public.orders(
-            "user_id", "items", "total_amount", "ordered_date", "ordered_time","payment_method", "order_status")
-            VALUES ($1,$2 ,$3, $4, $5, $6, 'processing')
+            "user_id", "items", "total_amount", "voucher_name", "voucher_amount", "ordered_date", "ordered_time","payment_method", "order_status")
+            VALUES ($1,$2 ,$3, $4, $5, $6, $7, $8, 'processing')
             RETURNING order_id;`;
 
         const params = [
             user_id,
             orderedItems,
             totalAmount,
+            voucherName,
+            discountAmount,
             date,
             time,
             paymentMethod,
@@ -195,7 +205,7 @@ async function getMyOrders(user_id) {
         };
     }
 }
-
+// Admin panel Manage orders
 async function getAllOrders() {
     try {
         let queryGetMyOrders = `SELECT * FROM public.orders ORDER BY order_id DESC `;
@@ -288,7 +298,7 @@ async function updateOrderStatus(orderID, status) {
         };
     }
 }
-
+// Vouchers
 async function addVoucher(voucherName, voucherAmount) {
     try {
         let queryInsertVoucherData = `INSERT INTO public."Vouchers"(
@@ -414,6 +424,38 @@ async function deleteVoucher(voucherID) {
     }
 }
 
+async function getVoucher(voucherName) {
+    try {
+        let queryGetVoucher = `SELECT * FROM public."Vouchers"
+        Where "voucher_name"='${voucherName}'`;
+
+        const result = await client.query(queryGetVoucher);
+
+        if (result.rowCount >= 1 && result.rows[0].voucher_id != null) {
+            return {
+                status: 200,
+                success: true,
+                msg: "vocuher found.",
+                data: result.rows[0],
+            };
+        }
+        console.log("Cannot find voucher with this name.");
+        return {
+            status: 404,
+            success: false,
+            msg: "Cannot find voucher with this name",
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
+
 module.exports = {
     signUp,
     insertOrderDetails,
@@ -427,4 +469,5 @@ module.exports = {
     getAllVoucher,
     changeStatusVoucher,
     deleteVoucher,
+    getVoucher,
 };

@@ -22,8 +22,8 @@ app.listen(PORT, (error) => {
 
 app.post("/check-existence", async(req, res) => {
     const { email } = req.body;
-    console.log(req.body);
-    console.log("Checking....");
+    // console.log(req.body);
+    // console.log("Checking....");
     const userExistence = await functions.checkUserExistence(email);
     if (
         userExistence.status == 200 &&
@@ -55,7 +55,7 @@ app.post("/signup", async(req, res) => {
         postal_code,
     } = req.body;
 
-    console.log("only req: ", req.body);
+    // console.log("only req: ", req.body);
 
     const userSignUp = await functions.signUp(req.body);
     if (userSignUp.status === "Success" && userSignUp.user_id) {
@@ -74,7 +74,7 @@ app.post("/signup", async(req, res) => {
 
 app.post("/signin", (req, res) => {
     const { email, password } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     let queryCheckUser = `SELECT * FROM public."Users" Where "Email" = '${email}'`;
 
@@ -107,7 +107,7 @@ app.post("/signin", (req, res) => {
 
 app.get("/get-details/:id", (req, res) => {
     const id = req.params.id;
-    console.log(id);
+    // console.log(id);
     let query = `SELECT * FROM public.products Where product_id ='${id}'`;
 
     client.query(query, (err, result) => {
@@ -122,7 +122,7 @@ app.get("/get-details/:id", (req, res) => {
 
 app.get("/get-detailsby/:category", (req, res) => {
     const category = req.params.category;
-    console.log(category);
+    // console.log(category);
     let query = `SELECT * FROM public.products where category = '${category}';`;
 
     client.query(query, (err, result) => {
@@ -153,7 +153,7 @@ app.get("/", (req, res) => {
 
 app.post("/add-item", (req, res) => {
     const { itemName, category, quantity, price, description, imgUrl } = req.body;
-    console.log(imgUrl);
+    // console.log(imgUrl);
     queryInsertItem = `INSERT INTO public.products(
         product_name, quantity_in_stock, price, category, description, photo_url)
         VALUES ('${itemName}', '${quantity}', '${price}', '${category}', '${description}','${imgUrl}')
@@ -183,7 +183,7 @@ app.post("/add-item", (req, res) => {
 
 app.delete("/delete-item/:id", (req, res) => {
     const id = req.params.id;
-    console.log(id);
+    // console.log(id);
 
     const queryDeleteItem = `DELETE FROM public.products WHERE "product_id"=${id};`;
 
@@ -240,7 +240,7 @@ app.post("/confirm-order", async(req, res) => {
         orderResult.success &&
         orderResult.order_id
     ) {
-        console.log("Order added successfully.");
+        // console.log("Order added successfully.");
         res.send({
             status: 200,
             success: true,
@@ -259,7 +259,7 @@ app.post("/confirm-order", async(req, res) => {
 
 app.get("/getmyorders/:userid", async(req, res) => {
     const id = req.params.userid;
-    console.log(id);
+    // console.log(id);
 
     const myOrders = await functions.getMyOrders(id);
     if (myOrders.status == 200 && myOrders.success) {
@@ -290,7 +290,7 @@ app.get("/getallorders", async(req, res) => {
 
 app.get("/getuser-infobyid/:userid", async(req, res) => {
     const userid = req.params.userid;
-    console.log(userid);
+    // console.log(userid);
 
     const userInfo = await functions.getUserInfoByID(userid);
     if (userInfo.status == 200 && userInfo.success) {
@@ -307,7 +307,7 @@ app.get("/getuser-infobyid/:userid", async(req, res) => {
 
 app.delete("/delete-order/:orderid", async(req, res) => {
     const orderID = req.params.orderid;
-    console.log(orderID);
+    // console.log(orderID);
 
     const orderDeleted = await functions.deleteOrder(orderID);
     if (orderDeleted.success && orderDeleted.status == 200) {
@@ -323,7 +323,7 @@ app.delete("/delete-order/:orderid", async(req, res) => {
 
 app.put("/update-order", async(req, res) => {
     const { orderID, status } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     const updatedOrder = await functions.updateOrderStatus(orderID, status);
     if (updatedOrder.status == 200 && updatedOrder.success) {
@@ -343,7 +343,7 @@ app.put("/update-order", async(req, res) => {
 
 app.post("/add-voucher", async(req, res) => {
     const { voucherName, voucherAmount } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     const result = await functions.addVoucher(voucherName, voucherAmount);
     if (result.status == 200 && result.success) {
@@ -390,7 +390,7 @@ app.patch("/changestatus-voucher", async(req, res) => {
 
 app.delete("/delete-voucher/:voucherid", async(req, res) => {
     const voucherID = req.params.voucherid;
-    console.log(voucherID);
+    // console.log(voucherID);
 
     const result = await functions.deleteVoucher(voucherID);
     if ((result.status = 200 && result.success)) {
@@ -402,13 +402,13 @@ app.delete("/delete-voucher/:voucherid", async(req, res) => {
 
 app.get("/get-voucher/:vouchername", async(req, res) => {
     const voucherName = req.params.vouchername;
-    console.log(voucherName);
+    // console.log(voucherName);
     const result = await functions.getVoucher(voucherName);
     if (result.status == 200 && result.success) {
-        console.log("YES\n\n", result);
+        // console.log("YES\n\n", result);
         res.send(result.data);
     } else {
-        console.log("NO\n\n", result);
+        // console.log("NO\n\n", result);
         res.send(result);
     }
 });

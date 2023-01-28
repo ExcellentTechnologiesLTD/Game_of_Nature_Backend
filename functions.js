@@ -14,8 +14,6 @@ async function signUp(info) {
             postal_code,
         } = info;
 
-        console.log("only info: ", phoneNumber);
-
         const queryInsertNewUser = `INSERT INTO public."Users"(
       "First_Name", "Email", "Mobile", "Address", "User_Type", "Last_Name","password", "city", "postal_code")
       VALUES ($1, $2, $3, $4, 'Customer', $5, $6, $7, $8)
@@ -36,7 +34,7 @@ async function signUp(info) {
         // console.log("Result here", result);
         if (result && result.rowCount) {
             // OR (result)
-            console.log("User registered.");
+            // console.log("User registered.");
             return {
                 status: "Success",
                 msg: "User Registered Successfully",
@@ -58,13 +56,11 @@ async function signUp(info) {
 }
 
 async function checkUserExistence(email) {
-    console.log("Checking: ", email);
+    // console.log("Checking: ", email);
     try {
         let queryCheckUserExistence = `SELECT * FROM public."Users" Where "Email" = '${email}'`;
         const result = await client.query(queryCheckUserExistence);
         if (result.rowCount > 0 && result.rows[0].Email === email) {
-            console.log("User found in DB.");
-            console.log("User Found");
             return {
                 status: 200,
                 msg: "User Found In DB.",
@@ -73,7 +69,7 @@ async function checkUserExistence(email) {
                 info: result.rows[0],
             };
         }
-        console.log("User Not Found");
+        // console.log("User Not Found");
         return { status: 404, msg: "User Not Found.", success: false };
     } catch (error) {
         console.error("Error", error);
@@ -101,7 +97,7 @@ async function insertOrderDetails(info) {
             postal_code,
             phone,
         } = info;
-        console.log("info:\n\n\n", info);
+
         let queryInsertOrderData = `INSERT INTO public.orders(
             "user_id", "items", "total_amount", "voucher_name", "voucher_amount", "ordered_date","ordered_time","payment_method","full_name","address","city","postal_code","phone","order_status")
             VALUES ($1,$2 ,$3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'processing')
@@ -125,7 +121,7 @@ async function insertOrderDetails(info) {
 
         const result = await client.query(queryInsertOrderData, params);
         if (result.rowCount == 1 && result.rows[0].order_id != null) {
-            console.log("Order added successfully.");
+            // console.log("Order added successfully.");
             return {
                 status: 200,
                 success: true,
@@ -150,15 +146,15 @@ async function insertOrderDetails(info) {
 }
 
 async function getUserInfoByID(userID) {
-    console.log("Checking: ", userID);
+    // console.log("Checking: ", userID);
     try {
         let queryGetUserInfo = `SELECT * FROM public."Users" Where "user_id" = '${userID}'`;
         const result = await client.query(queryGetUserInfo);
-        console.log("result \n", result);
+        // console.log("result \n", result);
 
         if (result.rowCount > 0 && result.rows[0].user_id == userID) {
-            console.log("User found in DB.");
-            console.log("User Found");
+            // console.log("User found in DB.");
+            // console.log("User Found");
             return {
                 status: 200,
                 msg: "User Found In DB.",
@@ -187,8 +183,8 @@ async function getMyOrders(user_id) {
         // const params = [user_id];
 
         const result = await client.query(queryGetMyOrders);
-        console.log("result : \n");
-        console.log(result);
+        // console.log("result : \n");
+        // console.log(result);
 
         if (result.rowCount >= 1 && result.rows[0].order_id != null) {
             return {
@@ -277,14 +273,12 @@ async function deleteOrder(orderID) {
 }
 
 async function updateOrderStatus(orderID, status) {
-    console.log("From function\n", orderID, "\n", status);
-
     try {
         let queryUpdateOrderStatus = `UPDATE public.orders
         SET "order_status"='${status}' WHERE "order_id"='${orderID}'`;
 
         const result = await client.query(queryUpdateOrderStatus);
-        console.log("result>>>\n ", result);
+
         if (result.rowCount == 1) {
             return {
                 status: 200,
@@ -319,7 +313,6 @@ async function addVoucher(voucherName, voucherAmount) {
         const params = [voucherName, voucherAmount];
 
         const result = await client.query(queryInsertVoucherData, params);
-        console.log("result>>>\n ", result);
 
         if (result.rowCount == 1 && result.rows[0].voucher_id != null) {
             return {
@@ -362,7 +355,7 @@ async function getAllVoucher() {
                 result: result.rows,
             };
         }
-        console.log("No Vouchers.");
+        // console.log("No Vouchers.");
         return {
             status: 200,
             success: true,
@@ -387,7 +380,6 @@ async function changeStatusVoucher(voucherID, status) {
                 WHERE voucher_id='${voucherID}'`;
 
         const result = await client.query(queryChangeStatus);
-        // console.log("result: >> from function \n\n", result);
 
         if (result.rowCount == 1) {
             return { status: 200, success: true, msg: "Status Changed." };
@@ -437,7 +429,7 @@ async function deleteVoucher(voucherID) {
 async function getVoucher(voucherName) {
     try {
         let queryGetVoucher = `SELECT * FROM public."Vouchers"
-        Where "voucher_name"='${voucherName}'`;
+        Where "voucher_name"='${voucherName}' AND "isActive"='true'`;
 
         const result = await client.query(queryGetVoucher);
 
@@ -449,7 +441,7 @@ async function getVoucher(voucherName) {
                 data: result.rows[0],
             };
         }
-        console.log("Cannot find voucher with this name.");
+        // console.log("Cannot find voucher with this name.");
         return {
             status: 404,
             success: false,

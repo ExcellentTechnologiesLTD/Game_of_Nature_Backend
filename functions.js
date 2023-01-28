@@ -9,7 +9,7 @@ async function signUp(info) {
             address,
             email,
             phoneNumber,
-            // password,
+            password,
             city,
             postal_code,
         } = info;
@@ -17,8 +17,8 @@ async function signUp(info) {
         console.log("only info: ", phoneNumber);
 
         const queryInsertNewUser = `INSERT INTO public."Users"(
-      "First_Name", "Email", "Mobile", "Address", "User_Type", "Last_Name", "city", "postal_code")
-      VALUES ($1, $2, $3, $4, 'Customer', $5, $6, $7)
+      "First_Name", "Email", "Mobile", "Address", "User_Type", "Last_Name","password", "city", "postal_code")
+      VALUES ($1, $2, $3, $4, 'Customer', $5, $6, $7, $8)
       RETURNING user_id;`;
 
         const params = [
@@ -27,7 +27,7 @@ async function signUp(info) {
             phoneNumber,
             address,
             lastName,
-            // password,
+            password,
             city,
             postal_code,
         ];

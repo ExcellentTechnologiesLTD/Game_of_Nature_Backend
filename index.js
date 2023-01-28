@@ -198,15 +198,13 @@ app.delete("/delete-item/:id", (req, res) => {
 
 app.post("/confirm-order", async(req, res) => {
     const {
-        email,
         user_id,
         orderedItems,
         totalAmount,
         paymentMethod,
         discountAmount,
         voucherName,
-        firstName,
-        lastName,
+        full_name,
         address,
         city,
         postal_code,
@@ -215,12 +213,6 @@ app.post("/confirm-order", async(req, res) => {
         time,
     } = req.body.orderInfo;
 
-    // //*********Date & Time******************************************************
-    // var today = new Date();
-    // var date =
-    //     today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-    // var time = today.getHours() + ":" + today.getMinutes();
-    // //*********Date & Time******************************************************
     const orderData = {
         user_id: user_id,
         orderedItems: orderedItems,
@@ -232,95 +224,36 @@ app.post("/confirm-order", async(req, res) => {
         paymentMethod: paymentMethod,
         date: date,
         time: time,
-    };
-
-    const signUpData = {
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
+        full_name: full_name,
         address: address,
         city: city,
         postal_code: postal_code,
-        phoneNumber: phoneNumber,
-        date: date,
-        time: time,
+        phone: phoneNumber,
     };
-    console.log("req.body:\n\n");
-    console.log(req.body);
-    console.log("OrderData:\n\n");
-    console.log(orderData);
-    console.log("signUpData:\n\n");
-    console.log(signUpData);
 
-    // if user Found
-    if (user_id) {
-        // insert order data into table
-        const orderResult = await functions.insertOrderDetails(orderData);
-        if (
-            orderResult.status == 200 &&
-            orderResult.success &&
-            orderResult.order_id
-        ) {
-            console.log("Order added successfully.");
-            res.send({
-                status: 200,
-                success: true,
-                msg: "Order placed.",
-                order_id: orderResult.order_id,
-                user_id: user_id,
-            });
-        } else {
-            res.send({
-                status: 404,
-                success: false,
-                msg: "Error, order not placed.",
-            });
-        }
+    // console.log("req.body:\n\n");
+    // console.log(req.body.orderInfo);
+
+    const orderResult = await functions.insertOrderDetails(orderData);
+    if (
+        orderResult.status == 200 &&
+        orderResult.success &&
+        orderResult.order_id
+    ) {
+        console.log("Order added successfully.");
+        res.send({
+            status: 200,
+            success: true,
+            msg: "Order placed.",
+            order_id: orderResult.order_id,
+            user_id: user_id,
+        });
     } else {
-        // create account
-        console.log("Creating user...");
-        const data = await functions.signUp(signUpData);
-        console.log("Data: ", data);
-
-        if (
-            data.status === "Success" &&
-            (data.user_id != undefined || data.user_id != null || data.user_id > 0)
-        ) {
-            // ******************************************************************************
-            // if user created enter order Info in DB
-            const orderDataAfterSignUp = {
-                user_id: data.user_id,
-                orderedItems: orderedItems,
-                totalAmount: totalAmount,
-                date: date,
-                time: time,
-                paymentMethod: paymentMethod,
-            };
-            console.log("Placing Order....");
-            const orderInserted = await functions.insertOrderDetails(
-                orderDataAfterSignUp
-            );
-            if (
-                orderInserted.status == 200 &&
-                orderInserted.success &&
-                orderInserted.order_id
-            ) {
-                console.log("Order added successfully.");
-                res.send({
-                    status: 200,
-                    success: true,
-                    msg: "Order placed.",
-                    order_id: orderInserted.order_id,
-                    user_id: data.user_id,
-                });
-            } else {
-                res.send({
-                    status: 404,
-                    success: false,
-                    msg: "Error, order not placed.",
-                });
-            }
-        }
+        res.send({
+            status: 404,
+            success: false,
+            msg: "Error, order not placed.",
+        });
     }
 });
 

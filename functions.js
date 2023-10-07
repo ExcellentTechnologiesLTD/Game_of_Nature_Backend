@@ -457,6 +457,59 @@ async function getVoucher(voucherName) {
         };
     }
 }
+async function getPolicies() {
+    try {
+        let queryGetPolicies = `SELECT * FROM public."Policies"`;
+        const result = await client.query(queryGetPolicies);
+        if (result.rowCount > 0) {
+            return {
+                status: 200,
+                msg: "policies found",
+                success: true,
+                info: result.rows[0],
+            };
+        }
+        // console.log("User Not Found");
+        return { status: 404, msg: "No policies found.", success: false };
+    } catch (error) {
+        console.error("Error", error);
+        return {
+            status: false,
+            error: error,
+        };
+    }
+}
+
+async function updatePolicy(jsonBody) {
+    try {
+        let queryUpdatePolicy = `UPDATE public."Policies"
+        SET "Terms_and_Condition"='${jsonBody.Terms_and_Condition}', "Return_and_Refund"='${jsonBody.Return_and_Refund}', "Inside_Dhaka_Delivery_Cost"='${jsonBody.Inside_Dhaka_Delivery_Cost}', "Outside_Dhaka_Delivery_Cost"='${jsonBody.Outside_Dhaka_Delivery_Cost}'`;
+
+        const result = await client.query(queryUpdatePolicy);
+
+        if (result.rowCount == 1) {
+            return {
+                status: 200,
+                success: true,
+                msg: "Policies updated.",
+            };
+        }
+        console.log("ERROR. Couldn't update policy.");
+        return {
+            status: 404,
+            success: false,
+            msg: "ERROR. Couldn't update policy.",
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 404,
+            success: false,
+            msg: "Error in query. Call Developer.",
+            data: error,
+        };
+    }
+}
 
 module.exports = {
     signUp,
@@ -472,4 +525,6 @@ module.exports = {
     changeStatusVoucher,
     deleteVoucher,
     getVoucher,
+    getPolicies,
+    updatePolicy,
 };

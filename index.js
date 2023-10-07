@@ -412,3 +412,20 @@ app.get("/get-voucher/:vouchername", async(req, res) => {
         res.send(result);
     }
 });
+
+app.post("/print-invoice", async(req, res) => {
+    const { orderID } = req.body;
+    console.log("order id: >> ", orderID);
+});
+
+app.get("/get-policies", async(req, res) => {
+    const policies = await functions.getPolicies();
+    console.log(policies.info);
+    res.send(policies);
+});
+
+app.put("/update-policy", async(req, res) => {
+    console.log(req.body);
+    const updatedPolicy = await functions.updatePolicy(req.body);
+    res.send(updatedPolicy);
+});

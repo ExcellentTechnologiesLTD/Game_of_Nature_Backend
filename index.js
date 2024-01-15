@@ -207,6 +207,7 @@ app.post("/confirm-order", async(req, res) => {
         full_name,
         address,
         city,
+        shipping_charge,
         postal_code,
         phoneNumber,
         date,
@@ -227,12 +228,14 @@ app.post("/confirm-order", async(req, res) => {
         full_name: full_name,
         address: address,
         city: city,
+        shipping_charge: shipping_charge,
         postal_code: postal_code,
         phone: phoneNumber,
     };
 
     // console.log("req.body:\n\n");
     // console.log(req.body.orderInfo);
+    console.log(orderData);
 
     const orderResult = await functions.insertOrderDetails(orderData);
     if (

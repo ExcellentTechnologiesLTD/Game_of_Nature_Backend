@@ -96,11 +96,12 @@ async function insertOrderDetails(info) {
             city,
             postal_code,
             phone,
+            shipping_charge,
         } = info;
 
         let queryInsertOrderData = `INSERT INTO public.orders(
-            "user_id", "items", "total_amount", "voucher_name", "voucher_amount", "ordered_date","ordered_time","payment_method","full_name","address","city","postal_code","phone","order_status")
-            VALUES ($1,$2 ,$3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'processing')
+            "user_id", "items", "total_amount", "voucher_name", "voucher_amount", "ordered_date","ordered_time","payment_method","full_name","address","city","postal_code","phone","shipping_charge","order_status")
+            VALUES ($1,$2 ,$3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'processing')
             RETURNING order_id;`;
 
         const params = [
@@ -117,6 +118,7 @@ async function insertOrderDetails(info) {
             city,
             postal_code,
             phone,
+            shipping_charge,
         ];
 
         const result = await client.query(queryInsertOrderData, params);
